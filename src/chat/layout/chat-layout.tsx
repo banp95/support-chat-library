@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-import { Outlet } from "react-router";
+import { Link, Outlet } from "react-router";
+import { ContactDetails } from "../components/contact-details";
 import ContactList from "../components/contact-list";
-import { NotContactSelected } from "../components/not-contact-selected";
 
 export default function ChatLayout() {
   return (
@@ -12,7 +12,9 @@ export default function ChatLayout() {
         <div className="p-4 border-b">
           <div className="flex items-center gap-2">
             <div className="h-6 w-6 rounded-full bg-primary" />
-            <span className="font-semibold">NexTalk</span>
+            <Link to={"/chat"}>
+              <span className="font-semibold">NexTalk</span>
+            </Link>
           </div>
         </div>
         <ContactList />
@@ -42,7 +44,8 @@ export default function ChatLayout() {
             <h2 className="font-medium">Contact details</h2>
           </div>
           {/* <ContactInfo /> */}
-          <NotContactSelected />
+          {/* <NotContactSelected /> */}
+          <ContactDetails />
         </div>
       </div>
     </div>
