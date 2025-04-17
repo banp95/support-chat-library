@@ -2,7 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { loginUser } from "@/fake/fake-data";
 import { cn } from "@/lib/utils";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router";
 
 export function LoginPage({
@@ -10,8 +12,18 @@ export function LoginPage({
   ...props
 }: React.ComponentProps<"div">) {
   const navigation = useNavigate();
+  const queryClient = useQueryClient();
+  const { mutate: loginMutation } = useMutation({
+    mutationFn: loginUser,
+    onSuccess: (data) => {
+      console.log(data);
+      localStorage.setItem("token", data.token);
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      navigation("/chat", { replace: true });
+    },
+  });
   const onGoogleLogin = () => {
-    navigation("/chat", { replace: true });
+    loginMutation();
   };
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
