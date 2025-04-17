@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router";
 
-export function LoginPage({
+export function RegisterPage({
   className,
   ...props
 }: React.ComponentProps<"div">) {
@@ -18,9 +18,14 @@ export function LoginPage({
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
                 <p className="text-balance text-muted-foreground">
-                  Login to your Acme Inc account
+                  Register to your Acme Inc account
                 </p>
               </div>
+              <div className="grid gap-2">
+                <Label htmlFor="email">Name</Label>
+                <Input id="name" type="text" placeholder="last name" required />
+              </div>
+
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -81,11 +86,8 @@ export function LoginPage({
               </div>
               <div className="text-center text-sm">
                 Don&apos;t have an account?{" "}
-                <Link
-                  to="/auth/register"
-                  className="underline underline-offset-4"
-                >
-                  Sign up
+                <Link to="/auth" className="underline underline-offset-4">
+                  Login
                 </Link>
               </div>
             </div>
