@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
+import { PrivateRoute } from "./auth/components/private-route";
 import AuthLayout from "./auth/layout";
 import { LoginPage } from "./auth/pages/login-page";
 import { RegisterPage } from "./auth/pages/register-page";
@@ -39,7 +40,9 @@ export const AppRouter = () => {
                 </div>
               }
             >
-              <ChatLayout />
+              <PrivateRoute isAuthenticated={false}>
+                <ChatLayout />
+              </PrivateRoute>
             </Suspense>
           }
         >
