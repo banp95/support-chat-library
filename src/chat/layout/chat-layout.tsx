@@ -1,10 +1,18 @@
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
-import { Link, Outlet } from "react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { LogOut, X } from "lucide-react";
+import { Link, Outlet, useNavigate } from "react-router";
 import { ContactDetails } from "../components/contact-details";
 import ContactList from "../components/contact-list";
 
 export default function ChatLayout() {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const logout = () => {
+    localStorage.removeItem("token");
+    queryClient.invalidateQueries({ queryKey: ["user"] });
+    navigate("/auth", { replace: true });
+  };
   return (
     <div className="flex h-screen bg-background">
       {/* Sidebar */}
@@ -18,6 +26,16 @@ export default function ChatLayout() {
           </div>
         </div>
         <ContactList />
+        <div className="p-4  border-t">
+          <Button
+            variant={"ghost"}
+            size="sm"
+            className="w-full"
+            onClick={logout}
+          >
+            <LogOut /> Logout
+          </Button>
+        </div>
       </div>
 
       {/* Main Content */}
