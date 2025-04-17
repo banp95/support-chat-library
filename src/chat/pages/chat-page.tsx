@@ -1,23 +1,45 @@
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
-import { getClientMessages } from "@/fake/fake-data";
-import { useQuery } from "@tanstack/react-query";
+import { getClientMessages, sendMessage } from "@/fake/fake-data";
+import { Message } from "@/interfaces/chat.interface";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Copy, Download, Send, ThumbsDown, ThumbsUp } from "lucide-react";
 import { useState } from "react";
 import { useParams } from "react-router";
 
 export default function ChatPage() {
   const { clientId } = useParams();
-
+  const [input, setInput] = useState("");
+  const queryClient = useQueryClient();
   const { data: messages = [], isLoading } = useQuery({
     queryKey: ["chat", clientId],
     queryFn: () => getClientMessages(clientId ?? ""),
     enabled: !!clientId,
     staleTime: 1000 * 60 * 5,
   });
-  const [input, setInput] = useState("");
 
+  const { mutate: sendMessageMutation } = useMutation({
+    mutationFn: sendMessage,
+    onSuccess: (newMessage) => {
+      queryClient.setQueryData(["chat", clientId], (oldMessage: Message[]) => [
+        ...oldMessage,
+        newMessage,
+      ]);
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    sendMessageMutation({
+      clientId: clientId ?? "",
+      content: input,
+      createdAt: new Date(),
+      sender: "agent",
+    });
+
+    setInput("");
+  };
   if (isLoading) {
     return (
       <div className="flex-1 flex flex-col">
@@ -46,32 +68,13 @@ export default function ChatPage() {
     );
   }
 
-  // const [messages] = useState<Message[]>([
-  //   {
-  //     role: "agent",
-  //     content: "Hello, I am a generative AI agent. How may I assist you today?",
-  //     timestamp: "4:08:28 PM",
-  //   },
-  //   {
-  //     role: "user",
-  //     content: "Hi, I'd like to check my bill.",
-  //     timestamp: "4:08:37 PM",
-  //   },
-  //   {
-  //     role: "agent",
-  //     content:
-  //       "Please hold for a second.\n\nOk, I can help you with that\n\nI'm pulling up your current bill information\n\nYour current bill is $150, and it is due on August 31, 2024.\n\nIf you need more details, feel free to ask!",
-  //     timestamp: "4:08:37 PM",
-  //   },
-  // ]);
-
   return (
     <div className="flex-1 flex flex-col">
       <ScrollArea className="flex-1 p-4">
         <div className="space-y-4">
           {messages.map((message, index) => (
             <div key={index} className="w-full">
-              {message.sender === "agent" ? (
+              {message.sender === "client" ? (
                 // Agent message - left aligned
                 <div className="flex gap-2 max-w-[80%]">
                   <div className="h-8 w-8 rounded-full bg-primary flex-shrink-0" />
@@ -124,7 +127,7 @@ export default function ChatPage() {
         </div>
       </ScrollArea>
       <div className="p-4 border-t">
-        <div className="flex items-center gap-2">
+        <form className="flex items-center gap-2" onSubmit={handleSubmit}>
           <Textarea
             placeholder="Type a message as a customer"
             value={input}
@@ -135,7 +138,7 @@ export default function ChatPage() {
             <Send className="h-4 w-4" />
             <span>Send</span>
           </Button>
-        </div>
+        </form>
       </div>
     </div>
   );
