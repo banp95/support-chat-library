@@ -1,3 +1,9 @@
+import AuthLayout from "./auth/layout";
+
 export default function App() {
-  return <div>App</div>;
+  return (
+    <div>
+      <AuthLayout />
+    </div>
+  );
 }
